@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Qiniu</id>
+    <title>qiniu-csharp-sdk</title>
+    <version>7.0.0</version>
+    <authors>BaiLong</authors>
+    <owners>qiniusdk</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>http://developer.qiniu.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Qiniu Resource (Cloud) Storage SDK for C#</description>
+    <tags>qiniu, cloud storage, storage</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="4.5.0.0" />
+    </dependencies>
+    <references>
+      <reference file="SuperSocket.Common.dll" />
+    </references>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Configuration"  />
+    </frameworkAssemblies>
+  </metadata>
+</package>
