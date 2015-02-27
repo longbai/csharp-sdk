@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EDC3AEE2-263F-40B0-9E0B-75DD7A5ABF32}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>chsarpsdk</RootNamespace>
+    <AssemblyName>chsarp-sdk</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Qiniu\Config.cs" />
+    <Compile Include="Qiniu\Util\Crc32.cs" />
+    <Compile Include="Qiniu\Util\Etag.cs" />
+    <Compile Include="Qiniu\Util\Json.cs" />
+    <Compile Include="Qiniu\Auth.cs" />
+    <Compile Include="Qiniu\Http\Client.cs" />
+    <Compile Include="Qiniu\Http\Response.cs" />
+    <Compile Include="Qiniu\Storage\UploadManager.cs" />
+    <Compile Include="Qiniu\Storage\BucketManager.cs" />
+    <Compile Include="Qiniu\Processing\Operation.cs" />
+    <Compile Include="Qiniu\Processing\OperationManager.cs" />
+    <Compile Include="Qiniu\Processing\Pipe.cs" />
+    <Compile Include="Qiniu\Processing\PersistentOperationManager.cs" />
+    <Compile Include="Qiniu\Util\UrlSafeBase64.cs" />
+    <Compile Include="Qiniu\Util\StringDict.cs" />
+    <Compile Include="Qiniu\Storage\Model\FileListing.cs" />
+    <Compile Include="Qiniu\Storage\Model\FileInfo.cs" />
+    <Compile Include="Qiniu.Test\AuthTest.cs" />
+    <Compile Include="Qiniu\Processing\ZipPackOp.cs" />
+    <Compile Include="Qiniu\Processing\SaveAsOp.cs" />
+    <Compile Include="Qiniu\Processing\GeneralOp.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Qiniu\" />
+    <Folder Include="Qiniu\Storage\" />
+    <Folder Include="Qiniu\Processing\" />
+    <Folder Include="Qiniu\Http\" />
+    <Folder Include="Qiniu\Util\" />
+    <Folder Include="Qiniu.Test\" />
+    <Folder Include="Qiniu\Storage\Model\" />
+    <Folder Include="Qiniu.Test\Http\" />
+    <Folder Include="Qiniu.Test\Processing\" />
+    <Folder Include="Qiniu.Test\Util\" />
+    <Folder Include="Qiniu.Test\Storage\" />
+    <Folder Include="Qiniu\Processing\Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
