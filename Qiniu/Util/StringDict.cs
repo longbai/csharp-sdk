@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace Qiniu.Util
@@ -43,12 +44,49 @@ namespace Qiniu.Util
 
 		public string FormString()
 		{
-			return null;
+			StringBuilder b = new StringBuilder ();
+			bool notFirst = false;
+			foreach (KeyValuePair<string, Object> kvp in dict)  
+			{  
+				if (notFirst) {
+					b.Append ('&');
+				}
+				b.Append (StringUtil.UrlEncode(kvp.Key));
+				b.Append ('=');
+				b.Append (StringUtil.UrlEncode(kvp.Value.ToString()));
+				notFirst = true;
+			}
+			return b.ToString ();
 		}
 
-		public string Join(string entrySep, string kvSep)
+		public string Join(string entrySep, string kvSep, string prefix)
 		{
-			return null;
+			StringBuilder b = new StringBuilder ();
+			if (prefix != null) {
+				b.Append (prefix);
+			}
+			bool notFirst = false;
+			foreach (KeyValuePair<string, Object> kvp in dict)  
+			{  
+				if (notFirst) {
+					b.Append (entrySep);
+				}
+				b.Append (kvp.Key);
+				b.Append (kvSep);
+				b.Append (kvp.Value);
+				notFirst = true;
+			}
+			return b.ToString ();
+		}
+
+		public delegate string consumer(string key, Object value);  
+
+		public void ForEach(consumer c)
+		{
+			foreach (KeyValuePair<string, Object> kvp in dict)  
+			{  
+				c (kvp.Key, kvp.Value);
+			}
 		}
 
 		public int Size()

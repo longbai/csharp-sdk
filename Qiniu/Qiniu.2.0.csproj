@@ -55,6 +55,7 @@
     <Compile Include="Util\StringDict.cs" />
     <Compile Include="Util\UrlSafeBase64.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\StringUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

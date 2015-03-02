@@ -158,6 +158,7 @@ namespace Qiniu.Storage
 
 				string t_bucket = target_bucket == null ? source_bucket : target_bucket;
 				List<string> ops = new List<string>();
+
 //				key_pairs.iterate(new StringMap.Do() {
 //					@Override
 //					public void deal(String key, Object value) {
