@@ -176,11 +176,11 @@ namespace Qiniu.Storage
 			}
 
 			public byte[] toBody() {
-				// ops is url safe, 
-				string body = "&op=" + String.Join ("op=", ops);
+				// ops is url safe,
+				string body = "&op=" + String.Join ("op=", ops.ToArray());
 				return Encoding.UTF8.GetBytes (body);
 			}
 		}
 	}
 }
-	
+

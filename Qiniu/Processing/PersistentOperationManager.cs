@@ -34,7 +34,7 @@ namespace Qiniu.Processing
 		}
 
 		public Response Post(string key, Pipe[] pipe) {
-			String fops = String.Join(";", (Object[])pipe);
+			 String fops = ""; //String.Join(";", (Object[])pipe);
 			StringDict dict = new StringDict().Put("bucket", bucket).Put("key", key).Put("fops", fops)
 				.PutNotEmpty("pipeline", pipeline).PutNotEmpty("notifyURL", notifyUrl).PutWhen("force", 1, force);
 

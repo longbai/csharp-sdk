@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AD4EA9D1-11C2-4BF6-8A06-72A966BC1B80}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Qiniu</RootNamespace>
+    <AssemblyName>Qiniu.4.0</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\4.0\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\4.0\Qiniu.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\4.0\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+   <ItemGroup>
+    <Compile Include="Auth.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Http\Client.cs" />
+    <Compile Include="Http\Response.cs" />
+    <Compile Include="Processing\GeneralOP.cs" />
+    <Compile Include="Processing\Operation.cs" />
+    <Compile Include="Processing\OperationManager.cs" />
+    <Compile Include="Processing\PersistentOperationManager.cs" />
+    <Compile Include="Processing\Pipe.cs" />
+    <Compile Include="Processing\SaveAsOp.cs" />
+    <Compile Include="Processing\ZipPackOp.cs" />
+    <Compile Include="Storage\BucketManager.cs" />
+    <Compile Include="Storage\UploadManager.cs" />
+    <Compile Include="Storage\Model\FileInfo.cs" />
+    <Compile Include="Storage\Model\FileListing.cs" />
+    <Compile Include="Util\Crc32.cs" />
+    <Compile Include="Util\Etag.cs" />
+    <Compile Include="Util\Json.cs" />
+    <Compile Include="Util\StringDict.cs" />
+    <Compile Include="Util\UrlSafeBase64.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\tools\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+	   Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup />
+</Project>
