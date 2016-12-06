@@ -6,81 +6,173 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 
 using Qiniu.Util;
+using Qiniu;
 
 namespace Qiniu.Http
 {
+	/// <summary>
+	/// Client.
+	/// </summary>
 	public class Client
 	{
+		/// <summary>
+		/// The content type header.
+		/// </summary>
 		public const string ContentTypeHeader = "Content-Type";
+		/// <summary>
+		/// The default MIME.
+		/// </summary>
 		public const string DefaultMime = "application/octet-stream";
+		/// <summary>
+		/// The json MIME.
+		/// </summary>
 		public const string JsonMime = "application/json";
+		/// <summary>
+		/// The form MIME.
+		/// </summary>
 		public const string FormMime = "application/x-www-form-urlencoded";
-		public Client ()
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Http.Client"/> class.
+		/// </summary>
+		public Client ():this(Configuration.DEFAULT_CONNECT_TIMEOUT, Configuration.DEFAULT_RESPONSE_TIMEOUT, null)
 		{
 		}
-			
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Http.Client"/> class.
+		/// </summary>
+		/// <param name="logger">Logger.</param>
+		public Client (ILogger logger):this(Configuration.DEFAULT_CONNECT_TIMEOUT, Configuration.DEFAULT_RESPONSE_TIMEOUT, logger)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Http.Client"/> class.
+		/// </summary>
+		public Client (int connectTimeout, int responseTimeout, ILogger logger)
+		{
+			this.connectTimeout = connectTimeout;
+			this.responseTimeout = responseTimeout;
+			this.logger = logger == null ? new DummyLogger () : logger;
+		}
+
+		private HttpWebRequest CreateRequest(string url, StringDict headers){
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create (url);
+			request.Timeout = connectTimeout;
+			request.ReadWriteTimeout = responseTimeout;
+			request.UserAgent = UserAgent();
+			if (headers != null) {
+				headers.ForEach(delegate (string k, Object val){
+					request.Headers.Set(k, val.ToString());
+				});
+			}
+
+			return request;
+		}
+
+		/// <summary>
+		/// Get the specified url.
+		/// </summary>
+		/// <param name="url">URL.</param>
 		public Response Get(string url)
 		{
 			return Get (url, new StringDict ());
 		}
+
+		/// <summary>
+		/// Get the specified url and headers.
+		/// </summary>
+		/// <param name="url">URL.</param>
+		/// <param name="headers">Headers.</param>
 		public Response Get(string url, StringDict headers)
 		{
+			HttpWebRequest req = CreateRequest (url, headers);
+			req.Method = "GET";
+			Elapse elapsed = new Elapse ();
 			try {
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create (url);
-				request.UserAgent = UserAgent();
-				request.Method = "GET";
-//				headers.itera
-				using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {
-					return HandleResponse (response);
+				using (HttpWebResponse response = req.GetResponse() as HttpWebResponse) {
+					long end = DateTime.Now.ToUniversalTime ().Ticks;
+					return HandleResponse (response, elapsed.Duration());
 				}
+			} catch (WebException e) {
+				HttpWebResponse response = e.Response as HttpWebResponse;
+				if (response != null) {
+					return HandleResponse (response, elapsed.Duration());
+				}
+				return Response.CreateBy(e.ToString(), elapsed.Duration());
 			} catch (Exception e) {
-				return new Response (-1, e.Message);
+				return Response.CreateBy(e.ToString(), elapsed.Duration());
 			}
 		}
 
+		/// <summary>
+		/// Post the specified url, body and headers.
+		/// </summary>
+		/// <param name="url">URL.</param>
+		/// <param name="body">Body.</param>
+		/// <param name="headers">Headers.</param>
 		public Response Post(string url, byte[] body, StringDict headers) 
 		{
 			return Post(url, body, headers, DefaultMime);
 		}
 
-		public Response post(string url, string body, StringDict headers) 
+		/// <summary>
+		/// Post the specified url, body and headers.
+		/// </summary>
+		/// <param name="url">URL.</param>
+		/// <param name="body">Body.</param>
+		/// <param name="headers">Headers.</param>
+		public Response Post(string url, string body, StringDict headers) 
 		{
 			return Post(url, Encoding.UTF8.GetBytes(body), headers, DefaultMime);
 		}
 
+		/// <summary>
+		/// Post the specified url, body, headers and contentType.
+		/// </summary>
+		/// <param name="url">URL.</param>
+		/// <param name="body">Body.</param>
+		/// <param name="headers">Headers.</param>
+		/// <param name="contentType">Content type.</param>
 		public Response Post(string url, byte[] body, StringDict headers, string contentType) 
 		{
-			try {
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create (url);
-				request.UserAgent = UserAgent();
-				request.Method = "POST";
-				request.ContentType = contentType;
-				request.ContentLength = body.Length;
-				//				headers.itera
-				using (Stream requestStream = request.GetRequestStream()) {
-					requestStream.Write(body, 0, body.Length);
-				}
-				using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {
-					return HandleResponse (response);
-				}
-			} catch (Exception e) {
-				return new Response (-1, e.Message);
+			HttpWebRequest request = CreateRequest (url, headers);
+			request.Method = "POST";
+			request.ContentType = contentType;
+			request.ContentLength = body.Length;
+			Elapse elapsed = new Elapse ();
+			using (Stream requestStream = request.GetRequestStream()) {
+				requestStream.Write(body, 0, body.Length);
 			}
+
+			return Send (request, elapsed);
 		}
 
 		private static string UserAgent()
 		{
-			return "QiniuCsharp/"+ Config.VERSION + " (" + Environment.OSVersion.Version.ToString() + "; )";
+			return "QiniuCSharp/"+ Configuration.VERSION + " (" + Environment.OSVersion.Version.ToString() + "; )";
 		}
 
-		private Response HandleResponse(HttpWebResponse response)
+		private Response HandleResponse(HttpWebResponse response, long duration)
 		{
-			return new Response (response);
+			string via = Via (response);
+			string reqId = response.GetResponseHeader ("X-Reqid");
+			string xlog = response.GetResponseHeader ("X-Log");
+			string contentType = response.ContentType;
+			byte[] body = null; 
+			if (response.ContentLength < 1024 * 10) {
+				body = new byte[response.ContentLength];
+				using (Stream stream = response.GetResponseStream()) {
+					stream.Read (body, 0, body.Length);
+				}
+			}
+			return new Response ((int)response.StatusCode, null, reqId, xlog, via, duration, response, body, contentType);
 		}
 
 		private static string MultiBoundary ()
 		{
-			return String.Format ("----------{0:N}", Guid.NewGuid ());
+			return String.Format ("----------{0:N}--", Guid.NewGuid ());
 		}
 
 		private static string MultiContentType (string boundary)
@@ -129,6 +221,13 @@ namespace Qiniu.Http
 
 		}
 
+		/// <summary>
+		/// Multis the post.
+		/// </summary>
+		/// <returns>The post.</returns>
+		/// <param name="url">URL.</param>
+		/// <param name="formData">Form data.</param>
+		/// <param name="filePath">File path.</param>
 		public Response MultiPost (string url, NameValueCollection formData, string filePath)
 		{
 			FileInfo fileInfo = new FileInfo (filePath);
@@ -137,36 +236,82 @@ namespace Qiniu.Http
 			}
 		}
 
+		/// <summary>
+		/// Multis the post.
+		/// </summary>
+		/// <returns>The post.</returns>
+		/// <param name="url">URL.</param>
+		/// <param name="formData">Form data.</param>
+		/// <param name="inputStream">Input stream.</param>
+		/// <param name="fileName">File name.</param>
 		public Response MultiPost (string url, NameValueCollection formData, Stream inputStream, string fileName)
 		{
+			HttpWebRequest request = CreateRequest (url, new StringDict ()); 
+			request.Method = "POST";
+			Elapse elapsed = new Elapse ();
+
 			string boundary = MultiBoundary ();
-			WebRequest webRequest = WebRequest.Create (url);
-
-			webRequest.Method = "POST";
-			webRequest.ContentType = "multipart/form-data; boundary=" + boundary;
-
 			Stream dataStream = BuildPostStream (inputStream, fileName, formData, boundary);
-			webRequest.ContentLength = dataStream.Length;
+			request.ContentLength = dataStream.Length;
+			request.ContentType = "multipart/form-data; boundary=" + boundary;
+
 			dataStream.Position = 0;
 
 			byte[] buffer = new byte[64*1024];
 			int bytesRead = 0;
-			Stream reqStream = webRequest.GetRequestStream ();
+			Stream reqStream = request.GetRequestStream ();
 			while ((bytesRead = dataStream.Read(buffer, 0, buffer.Length)) != 0) {
 				reqStream.Write (buffer, 0, bytesRead);
 			}
 			dataStream.Close ();
 			reqStream.Close ();
+			return Send (request, elapsed);       
+		}
 
+		private Response Send(HttpWebRequest request, Elapse elapsed){
 			try {
-				using (HttpWebResponse response = webRequest.GetResponse() as HttpWebResponse) {                   
-					return HandleResponse (response);
+				using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {                   
+					return HandleResponse (response, elapsed.Duration());
 				}
 
+			} catch (WebException e) {
+				HttpWebResponse response = e.Response as HttpWebResponse;
+				if (response != null) {
+					return HandleResponse (response, elapsed.Duration());
+				}
+				return Response.CreateBy(e.ToString(), elapsed.Duration());
 			} catch (Exception e) {
-				return new Response (-1, e.Message);
-			}            
+				return Response.CreateBy(e.ToString(), elapsed.Duration());
+			}
 		}
+
+		private static string Via(HttpWebResponse response) {
+			string via;
+			if ((via = response.GetResponseHeader("X-Via")) != "") {
+				return via;
+			}
+
+			if ((via = response.GetResponseHeader("X-Px")) != "") {
+				return via;
+			}
+
+			if ((via = response.GetResponseHeader("Fw-Via")) != "") {
+				return via;
+			}
+
+			if ((via = response.GetResponseHeader("Via")) != "") {
+				return via;
+			}
+
+			return via;
+		}
+
+		private static string Ctype(HttpWebResponse response) {
+			return response.ContentType;
+		}
+
+		private int connectTimeout;
+		private int responseTimeout;
+		private ILogger logger;
 	}
 }
-

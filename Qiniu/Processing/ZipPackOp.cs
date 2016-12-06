@@ -5,41 +5,56 @@ using Qiniu.Util;
 
 namespace Qiniu.Processing
 {
+	/// <summary>
+	/// Zip pack op.
+	/// </summary>
 	public class ZipPackOp : Operation
 	{
-		private StringDict args;
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Processing.ZipPackOp"/> class.
+		/// </summary>
 		public ZipPackOp() {
 			args = new StringDict();
 		}
 
+		/// <summary>
+		/// Append the specified url.
+		/// </summary>
+		/// <param name="url">URL.</param>
 		public ZipPackOp Append(string url) {
 			return Append(url, "");
 		}
 
+		/// <summary>
+		/// Append the specified url and alias.
+		/// </summary>
+		/// <param name="url">URL.</param>
+		/// <param name="alias">Alias.</param>
 		public ZipPackOp Append(string url, string alias) {
 			args.Put(url, alias);
 			return this;
 		}
 
+		/// <summary>
+		/// Build this instance.
+		/// </summary>
 		public String Build() {
 			if (args.Size() == 0) {
 				throw new ArgumentException ("zip list must have at least one part.");
 			}
 			StringBuilder b = new StringBuilder("mkzip");
-//			args.iterate(new StringMap.Do() {
-//				@Override
-//				public void deal(String key, Object value) {
-//					b.append("/url/");
-//					b.append(UrlSafeBase64.encodeToString(key));
-//					String val = (String) value;
-//					if (!StringUtils.isNullOrEmpty(val)) {
-//						b.append("/alias/");
-//						b.append(UrlSafeBase64.encodeToString(val));
-//					}
-//				}
-//			});
+			args.ForEach (delegate (string key, object value) {
+				b.Append ("/url/");
+				b.Append (UrlSafeBase64.Encode (key));
+				string val = (string)value;
+				if (!String.IsNullOrEmpty (val)) {
+					b.Append ("/alias/");
+					b.Append (UrlSafeBase64.Encode (val));
+				}
+			});
 			return b.ToString();
 		}
+
+		private StringDict args;
 	}
 }

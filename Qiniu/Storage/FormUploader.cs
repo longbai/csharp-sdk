@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace Qiniu
+namespace Qiniu.Storage
 {
-	public class FormUploader
+	class FormUploader
 	{
 		public FormUploader ()
 		{
 		}
 	}
 }
-

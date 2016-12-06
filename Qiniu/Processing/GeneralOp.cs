@@ -3,11 +3,22 @@ using System.Text;
 
 namespace Qiniu.Processing
 {
+	/// <summary>
+	/// General op.
+	/// </summary>
 	public class GeneralOp
 	{
+		/// <summary>
+		/// The arguments count.
+		/// </summary>
 		protected int argsCount = 0;
 		private StringBuilder content;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Processing.GeneralOp"/> class.
+		/// </summary>
+		/// <param name="cmd">Cmd.</param>
+		/// <param name="mode">Mode.</param>
 		public GeneralOp(string cmd, Object mode)
 		{
 			content = new StringBuilder();
@@ -18,10 +29,19 @@ namespace Qiniu.Processing
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Processing.GeneralOp"/> class.
+		/// </summary>
+		/// <param name="cmd">Cmd.</param>
 		public GeneralOp(String cmd):this(cmd, null)
 		{
 		}
 			
+		/// <summary>
+		/// Put the specified key and value.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
 		public GeneralOp put(String key, Object value)
 		{
 			argsCount++;
@@ -34,6 +54,9 @@ namespace Qiniu.Processing
 			return this;
 		}
 
+		/// <summary>
+		/// Build this instance.
+		/// </summary>
 		public String Build()
 		{
 			return content.ToString();

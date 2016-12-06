@@ -3,9 +3,9 @@
 namespace Qiniu
 {
 	/// <summary>
-	/// Config.
+	/// Configuration.
 	/// </summary>
-	public static class Config
+	public class Configuration
 	{
 		/// <summary>
 		/// The VERSION.
@@ -35,33 +35,36 @@ namespace Qiniu
 		/**
      * 默认上传服务器
      */
-		public static String UP_HOST = "http://up.qiniu.com";
+		public  String UP_HOST = "http://up.qiniu.com";
 		/**
      * 备用上传服务器，当默认服务器网络链接失败时使用
      */
-		public static String UP_HOST_BACKUP = "http://upload.qiniu.com";
+		public  String UP_HOST_BACKUP = "http://upload.qiniu.com";
 		/**
      * 断点上传时的分片大小(可根据网络情况适当调整)
      */
-		public static int CHUNK_SIZE = 256 * 1024;
+		public  int CHUNK_SIZE = 256 * 1024;
 		/**
      * 如果文件大小大于此值则使用断点上传, 否则使用Form上传
      */
-		public static int PUT_THRESHOLD = BLOCK_SIZE;
+		public int PUT_THRESHOLD = BLOCK_SIZE;
 		/**
      * 连接超时时间(默认10s)
      */
-		public static int CONNECT_TIMEOUT = 10 * 1000;
+		public const int DEFAULT_CONNECT_TIMEOUT = 10 * 1000;
 		/**
      * 回复超时时间(默认30s)
      */
-		public static int RESPONSE_TIMEOUT = 30 * 1000;
+		public const int DEFAULT_RESPONSE_TIMEOUT = 30 * 1000;
 		/**
      * 上传失败重试次数
      */
-		public static int RETRY_MAX = 5;
+		public int RETRY_MAX = 5;
 
-		public static Util.ILogger Logger = null;
+		/// <summary>
+		/// The logger.
+		/// </summary>
+		public Util.ILogger Logger = null;
 
 	}
 }

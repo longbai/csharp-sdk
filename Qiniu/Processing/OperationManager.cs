@@ -4,6 +4,9 @@ using Qiniu.Http;
 
 namespace Qiniu.Processing
 {
+	/// <summary>
+	/// Operation manager.
+	/// </summary>
 	public class OperationManager
 	{
 		private Auth auth;
@@ -11,7 +14,14 @@ namespace Qiniu.Processing
 		private string domain;
 		private Client client;
 
-		public OperationManager(string domain, Auth auth, long tokenExpire)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Processing.OperationManager"/> class.
+		/// </summary>
+		/// <param name="domain">Domain.</param>
+		/// <param name="auth">Auth.</param>
+		/// <param name="tokenExpire">Token expire.</param>
+		/// <param name="config">Config.</param>
+		public OperationManager(string domain, Auth auth, long tokenExpire, Configuration config)
 		{
 			this.auth = auth;
 			this.domain = domain;
@@ -19,7 +29,11 @@ namespace Qiniu.Processing
 			client = new Client();
 		}
 
-		public OperationManager(string domain):this(domain, null, 0)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Qiniu.Processing.OperationManager"/> class.
+		/// </summary>
+		/// <param name="domain">Domain.</param>
+		public OperationManager(string domain):this(domain, null, 0, null)
 		{
 		}
 
@@ -32,10 +46,20 @@ namespace Qiniu.Processing
 			return auth.PrivateDownloadUrl(baseUrl, tokenExpire);
 		}
 
+		/// <summary>
+		/// Get the specified key and op.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="op">Op.</param>
 		public Response Get(string key, Operation op) {
 			return Get(key, new Pipe().Append(op));
 		}
 
+		/// <summary>
+		/// Get the specified key and pipe.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="pipe">Pipe.</param>
 		public Response Get(string key, Pipe pipe) {
 			String url = BuildUrl(key, pipe);
 			return client.Get(url);

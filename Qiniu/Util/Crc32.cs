@@ -3,8 +3,25 @@ using System.IO;
 
 namespace Qiniu.Util
 {
+	/// <summary>
+	/// Crc32.
+	/// </summary>
 	public static class Crc32
 	{
+		/// <summary>
+		/// Byteses the sum.
+		/// </summary>
+		/// <returns>The sum.</returns>
+		/// <param name="data">Data.</param>
+		public static UInt32 BytesSum(byte[] data){
+			return BytesSum (data, data.Length);
+		}
+		/// <summary>
+		/// Byteses the sum.
+		/// </summary>
+		/// <returns>The sum.</returns>
+		/// <param name="data">Data.</param>
+		/// <param name="length">Length.</param>
 		public static UInt32 BytesSum (byte[] data,int length)
 		{
 			Imp crc = new Imp ();
@@ -12,6 +29,11 @@ namespace Qiniu.Util
 			return crc.Sum32 ();
 		}
 
+		/// <summary>
+		/// Files the sum.
+		/// </summary>
+		/// <returns>The sum.</returns>
+		/// <param name="fileName">File name.</param>
 		public static UInt32 FileSum (string fileName)
 		{
 			Imp crc = new Imp ();

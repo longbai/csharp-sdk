@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Qiniu
+namespace Qiniu.Storage
 {
-	public class ResumeUploader
+	class ResumeUploader
 	{
 		public ResumeUploader ()
 		{
